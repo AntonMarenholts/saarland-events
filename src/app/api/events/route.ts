@@ -7,7 +7,6 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // Валидация обязательных полей
     const {
       location,
       date,
@@ -31,9 +30,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Использование транзакции для атомарной операции
     await db.transaction(async (tx) => {
-      // 1. Вставка основного события
       const [newEvent] = await tx
         .insert(eventsTable)
         .values({
@@ -42,7 +39,7 @@ export async function POST(req: NextRequest) {
           imageUrl,
           organizerName,
           organizerEmail,
-          status: "pending", // Все новые события сначала ожидают модерации
+          status: "pending",
         })
         .returning();
 
@@ -52,7 +49,6 @@ export async function POST(req: NextRequest) {
 
       const eventId = newEvent.id;
 
-      // 2. Вставка переводов
       if (name_en) {
         await tx.insert(eventTranslationsTable).values({
           eventId,

@@ -27,9 +27,9 @@ export default function ModerationList({ events: initialEvents }: { events: Even
     });
 
     if (res.ok) {
-      // Обновляем состояние, чтобы удалить событие из списка
+      
       setEvents((prevEvents) => prevEvents.filter((event) => event.id !== eventId));
-      router.refresh(); // Обновляем страницу для синхронизации
+      router.refresh(); 
     } else {
       alert("Ошибка при модерации события.");
     }

@@ -11,7 +11,7 @@ export default function EventForm() {
     imageUrl: "",
     organizerName: "",
     organizerEmail: "",
-    // Translations for different languages
+    
     name_en: "",
     description_en: "",
     name_de: "",
@@ -70,8 +70,7 @@ export default function EventForm() {
         description_ru: "",
       });
       
-      // Можно перенаправить на другую страницу, например, на список событий
-      // router.push('/events');
+      
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);

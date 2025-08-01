@@ -8,7 +8,7 @@ import ukrTranslations from "@/locale/ukr.json";
 
 type Locale = "en" | "de" | "ukr" | "ru";
 
-// Рекурсивный тип для глубоких переводов
+
 type TranslationValue = string | { [key: string]: TranslationValue };
 type Translations = Record<string, TranslationValue>;
 
@@ -19,7 +19,7 @@ const translations: Record<Locale, Translations> = {
   ukr: ukrTranslations,
 };
 
-// Helper function to get nested keys with a specific type
+
 const getNestedTranslation = (obj: Translations, path: string): string => {
   const keys = path.split('.');
   let result: TranslationValue = obj;
@@ -27,7 +27,7 @@ const getNestedTranslation = (obj: Translations, path: string): string => {
     if (typeof result === 'object' && result !== null && key in result) {
       result = result[key];
     } else {
-      return path; // Return the key itself if not found
+      return path;
     }
   }
   return typeof result === 'string' ? result : path;

@@ -14,8 +14,8 @@ export const eventsTable = pgTable("events", {
   location: text("location").notNull(),
   date: timestamp("date").notNull(),
   imageUrl: text("image_url"),
-  // Новые поля для проекта
-  status: varchar("status", { length: 50 }).default("pending").notNull(), // 'pending', 'approved', 'rejected'
+  
+  status: varchar("status", { length: 50 }).default("pending").notNull(),
   organizerName: varchar("organizer_name", { length: 255 }),
   organizerEmail: varchar("organizer_email", { length: 255 }),
   latitude: numeric("latitude"),
