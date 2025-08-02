@@ -1,32 +1,37 @@
 {
-  "name": "saarland-events",
+  "name": "sport-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "migrate": "drizzle-kit migrate",
+    "generate": "drizzle-kit generate"
   },
   "dependencies": {
     "dotenv": "^17.2.1",
-    "drizzle-kit": "^0.31.4",
-    "drizzle-orm": "^0.44.4",
-    "next": "15.4.5",
-    "postgres": "^3.4.7",
+    "drizzle-orm": "^0.44.3",
+    "next": "15.4.2",
+    "next-auth": "^4.24.11",
+    "next-themes": "^0.4.6",
+    "pg": "^8.16.3",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "zod": "^4.0.13"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/pg": "^8.15.5",
+    "@types/pg": "^8.15.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.4",
     "eslint": "^9",
-    "eslint-config-next": "15.4.5",
+    "eslint-config-next": "15.4.2",
     "tailwindcss": "^4",
-    "typescript": "^5.9.2"
+    "typescript": "^5"
   }
 }

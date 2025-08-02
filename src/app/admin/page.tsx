@@ -1,51 +1,29 @@
-import EventForm from "@/components/EventForm";
-import enTranslations from "@/locale/en.json";
-import ruTranslations from "@/locale/ru.json";
-import deTranslations from "@/locale/de.json";
-import ukrTranslations from "@/locale/ukr.json";
+import { authOptions } from "@/lib/auth/authOptions";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+// Убедимся, что путь к файлу authOptions правильный. 
+// Если вы создавали его по нашей старой структуре, он должен быть здесь:
 
 
-const translations = {
-  en: enTranslations,
-  ru: ruTranslations,
-  de: deTranslations,
-  ukr: ukrTranslations,
-};
+export default async function AdminDashboard() {
+  // Теперь этот код активен
+  const session = await getServerSession(authOptions);
 
-type Locale = "en" | "de" | "ukr" | "ru";
-type TranslationValue = string | { [key: string]: TranslationValue };
-type Translations = Record<string, TranslationValue>;
-
-
-const getNestedTranslation = (obj: Translations, path: string): string => {
-  const keys = path.split('.');
-  let result: TranslationValue = obj;
-  for (const key of keys) {
-    if (typeof result === 'object' && result !== null && key in result) {
-      result = result[key];
-    } else {
-      return path; 
-    }
+  // Если пользователя нет ИЛИ его роль не 'admin', перенаправляем на главную страницу
+  // ВАЖНО: Мы скоро сделаем вас админом.
+  if (!session || session.user?.role !== "admin") {
+    redirect("/");
   }
-  return typeof result === 'string' ? result : path;
-};
-
-export default function AdminPage({
-  params,
-}: {
-  params: { locale: Locale };
-}) {
-  const locale = params.locale;
-
-  
-  const t = (key: string) => {
-    return getNestedTranslation(translations[locale] as Translations, key);
-  };
 
   return (
-    <main className="p-8 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">{t("addEventTitle")}</h1>
-      <EventForm t={t} locale={locale} />
-    </main>
+    <section className="container mx-auto py-8 px-4">
+      <h1 className="text-3xl font-bold mb-6">Панель администратора</h1>
+      
+      <div className="bg-card-background border border-card-border rounded-lg p-6">
+        <h2 className="text-xl font-semibold mb-4">Добро пожаловать, {session?.user?.name}!</h2>
+        <p>Здесь вы сможете добавлять, редактировать и управлять событиями.</p>
+        {/* Скоро здесь появится форма для добавления событий */}
+      </div>
+    </section>
   );
 }
