@@ -1,12 +1,12 @@
 // src/app/admin/actions.ts
-
 "use server";
 
 import { db } from "@/db";
 import { eventsTable, eventTranslationsTable, eventsToCategoriesTable } from "@/db/schema";
 import { revalidatePath } from "next/cache";
+import { eq } from "drizzle-orm"; // <-- ВОТ ИСПРАВЛЕНИЕ
 
-// Убираем лишний параметр prevState
+// ... ваша функция createEvent ...
 export async function createEvent(formData: FormData) {
   const name_de = formData.get("name_de") as string;
   const description_de = formData.get("description_de") as string;
@@ -14,10 +14,7 @@ export async function createEvent(formData: FormData) {
   const date = new Date(formData.get("date") as string);
   const categoryId = Number(formData.get("categoryId"));
 
-  // Простая проверка на наличие данных
   if (!name_de || !location || !date || !categoryId) {
-    // В этой простой версии мы не можем легко вернуть сообщение об ошибке,
-    // но мы можем прервать выполнение, если поля пустые.
     console.error("Все поля должны быть заполнены!");
     return;
   }
@@ -39,11 +36,27 @@ export async function createEvent(formData: FormData) {
       eventId: newEvent.id,
       categoryId: categoryId,
     });
-
-    // Этот вызов обновит данные на странице после создания события
-    revalidatePath("/admin"); 
+    
+    revalidatePath("/admin");
     
   } catch (error) {
     console.error("Ошибка при создании события:", error);
+  }
+}
+
+
+export async function deleteEvent(eventId: number) {
+  try {
+    await db.delete(eventTranslationsTable).where(eq(eventTranslationsTable.eventId, eventId));
+    await db.delete(eventsToCategoriesTable).where(eq(eventsToCategoriesTable.eventId, eventId));
+    await db.delete(eventsTable).where(eq(eventsTable.id, eventId));
+
+    revalidatePath("/admin");
+    revalidatePath("/");
+    
+    return { success: true, message: "Событие успешно удалено." };
+  } catch (error) {
+    console.error("Ошибка при удалении события:", error);
+    return { success: false, message: "Не удалось удалить событие." };
   }
 }
