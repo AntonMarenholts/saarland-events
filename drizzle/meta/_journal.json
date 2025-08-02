@@ -15,6 +15,13 @@
       "when": 1754124907558,
       "tag": "0001_watery_raza",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1754152906337,
+      "tag": "0002_nifty_tigra",
+      "breakpoints": true
     }
   ]
 }

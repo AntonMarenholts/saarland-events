@@ -67,7 +67,7 @@ export default async function AdminDashboard() {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{event.location}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{new Date(event.date).toLocaleDateString('de-DE')}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <a href="#" className="text-indigo-600 hover:text-indigo-900 mr-4">Редактировать</a>
+                                        <a href={`/admin/edit/${event.id}`} className="text-indigo-600 hover:text-indigo-900 mr-4">Редактировать</a>
                                         <DeleteEventButton eventId={event.id} />
                                     </td>
                                 </tr>
