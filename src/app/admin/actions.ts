@@ -11,15 +11,13 @@ import { revalidatePath } from "next/cache";
 import { eq, and } from "drizzle-orm";
 
 
-/**
- * Создает новое событие в базе данных.
- */
 export async function createEvent(formData: FormData) {
   const name_de = formData.get("name_de") as string;
   const description_de = formData.get("description_de") as string;
   const location = formData.get("location") as string;
   const date = new Date(formData.get("date") as string);
   const categoryId = Number(formData.get("categoryId"));
+  const imageUrl = formData.get("imageUrl") as string;
 
   if (!name_de || !location || !date || !categoryId) {
     console.error("Все поля должны быть заполнены!");
@@ -29,7 +27,7 @@ export async function createEvent(formData: FormData) {
   try {
     const [newEvent] = await db
       .insert(eventsTable)
-      .values({ location, date, status: "approved" })
+      .values({ location, date, status: "approved",imageUrl })
       .returning();
 
     await db.insert(eventTranslationsTable).values({
@@ -50,9 +48,6 @@ export async function createEvent(formData: FormData) {
   }
 }
 
-/**
- * Удаляет событие и все связанные с ним данные.
- */
 export async function deleteEvent(eventId: number) {
   try {
     await db.delete(eventsTable).where(eq(eventsTable.id, eventId));
@@ -65,9 +60,6 @@ export async function deleteEvent(eventId: number) {
   }
 }
 
-/**
- * Обновляет существующее событие с более надежной логикой.
- */
 export async function updateEvent(
   prevState: { message: string; success: boolean },
   formData: FormData
@@ -78,20 +70,19 @@ export async function updateEvent(
   const location = formData.get("location") as string;
   const date = new Date(formData.get("date") as string);
   const categoryId = Number(formData.get("categoryId"));
-
   const name_en = formData.get("name_en") as string;
   const description_en = formData.get("description_en") as string;
   const name_ru = formData.get("name_ru") as string;
   const description_ru = formData.get("description_ru") as string;
+  const imageUrl = formData.get("imageUrl") as string;
 
   try {
-    // 1. Обновляем основную информацию о событии
     await db
       .update(eventsTable)
-      .set({ location, date })
+      .set({ location, date, imageUrl })
       .where(eq(eventsTable.id, eventId));
 
-    // 2. Обновляем или создаем переводы
+    
     const translations = [
       { locale: "de", name: name_de, description: description_de },
       { locale: "en", name: name_en, description: description_en },
