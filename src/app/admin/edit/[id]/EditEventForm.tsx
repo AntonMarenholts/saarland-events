@@ -40,24 +40,37 @@ export default function EditEventForm({ eventData, allCategories }: EditEventFor
     setIsTranslating(true);
     try {
       const textsToTranslate = [
-        { text: nameDe, lang: 'en', setter: setNameEn },
-        { text: descDe, lang: 'en', setter: setDescEn },
-        { text: nameDe, lang: 'ru', setter: setNameRu },
-        { text: descDe, lang: 'ru', setter: setDescRu }
+        { text: nameDe, lang: "en-US", setter: setNameEn },
+        { text: descDe, lang: "en-US", setter: setDescEn },
+        { text: nameDe, lang: "ru", setter: setNameRu },
+        { text: descDe, lang: "ru", setter: setDescRu },
       ];
 
       for (const item of textsToTranslate) {
         if (!item.text) continue;
-        const res = await fetch('/api/translate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        
+        const res = await fetch("/api/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text: item.text, targetLang: item.lang }),
         });
+
+        // --- НАЧАЛО НОВОГО КОДА ДЛЯ ОБРАБОТКИ ОШИБОК ---
+        if (!res.ok) {
+          // Если ответ не успешный (статус не 2xx), читаем ошибку из тела ответа
+          const errorBody = await res.json();
+          // Показываем детальную ошибку, которую вернул наш сервер
+          throw new Error(`Ошибка перевода для языка '${item.lang}': ${errorBody.error || res.statusText}`);
+        }
+        // --- КОНЕЦ НОВОГО КОДА ---
+
         const { translatedText } = await res.json();
         item.setter(translatedText);
       }
-    } catch {
-      alert('Ошибка при переводе.');
+    } catch (error) {
+      // Теперь alert покажет детальное сообщение об ошибке
+      const message = error instanceof Error ? error.message : 'Произошла неизвестная ошибка при переводе.';
+      alert(message);
     }
     setIsTranslating(false);
   };
