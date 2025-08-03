@@ -5,9 +5,11 @@ import {
   eventsTable,
   eventTranslationsTable,
   eventsToCategoriesTable,
+  categoriesTable,
 } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { eq, and } from "drizzle-orm";
+
 
 /**
  * Создает новое событие в базе данных.
@@ -160,3 +162,55 @@ export async function getEventForEdit(eventId: number) {
 
   return { eventData, allCategories };
 }
+
+export async function createCategory(formData: FormData) {
+  const name = formData.get("name") as string;
+  const description = formData.get("description") as string;
+
+  if (!name) {
+    // В реальном приложении здесь была бы более сложная обработка ошибок
+    console.error("Название категории не может быть пустым!");
+    return;
+  }
+
+  try {
+    await db.insert(categoriesTable).values({ name, description });
+    revalidatePath("/admin/categories"); // Обновляем кэш страницы категорий
+  } catch (error) {
+    console.error("Ошибка при создании категории:", error);
+  }
+}
+
+/**
+ * Удаляет категорию.
+ */
+export async function deleteCategory(categoryId: number) {
+  try {
+    // Проверяем, есть ли события, связанные с этой категорией
+    const relatedEvents = await db.query.eventsToCategoriesTable.findFirst({
+        where: eq(eventsToCategoriesTable.categoryId, categoryId),
+    });
+
+    if (relatedEvents) {
+        return { success: false, message: "Нельзя удалить категорию, так как к ней привязаны события." };
+    }
+
+    await db.delete(categoriesTable).where(eq(categoriesTable.id, categoryId));
+    revalidatePath("/admin/categories");
+    return { success: true, message: "Категория успешно удалена." };
+  } catch (error) {
+    console.error("Ошибка при удалении категории:", error);
+    return { success: false, message: "Не удалось удалить категорию." };
+  }
+}
+
+/**
+ * Получает все категории из базы данных.
+ */
+export async function getAllCategories() {
+  return await db.query.categoriesTable.findMany({
+    orderBy: (categories, { asc }) => [asc(categories.name)],
+  });
+}
+
+
