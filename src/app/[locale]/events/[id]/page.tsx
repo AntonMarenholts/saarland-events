@@ -2,7 +2,7 @@ import { db } from "@/db";
 import { eventsTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/navigation";
 import BackButton from "@/components/BackButton/BackButton";
 
 // Эта функция будет загружать данные для конкретного события

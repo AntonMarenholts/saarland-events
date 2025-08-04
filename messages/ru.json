@@ -1,0 +1,12 @@
+{
+  "Header": {
+    "all_categories": "Все категории",
+    "all_years": "Все годы",
+    "all_months": "Все месяцы",
+    "add_event": "Добавить событие"
+  },
+  "AuthButton": {
+    "login": "Войти через Google",
+    "logout": "Выйти"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "Header": {
+    "all_categories": "Alle Kategorien",
+    "all_years": "Alle Jahre",
+    "all_months": "Alle Monate",
+    "add_event": "Veranstaltung hinzufügen"
+  },
+  "AuthButton": {
+    "login": "Anmelden mit Google",
+    "logout": "Abmelden"
+  }
+}
