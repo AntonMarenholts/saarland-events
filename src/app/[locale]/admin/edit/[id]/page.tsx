@@ -1,9 +1,13 @@
-import { getEventForEdit } from "../../actions";
+import { getEventForEdit } from "../../../../actions";
 import EditEventForm from "./EditEventForm";
 
-export default async function EditEventPage({ params }: { params: { id: string } }) {
+export default async function EditEventPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const eventId = Number(params.id);
-  
+
   // Безопасно получаем данные на сервере
   const { eventData, allCategories } = await getEventForEdit(eventId);
 

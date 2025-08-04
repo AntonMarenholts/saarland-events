@@ -1,0 +1,12 @@
+{
+  "Header": {
+    "all_categories": "All Categories",
+    "all_years": "All Years",
+    "all_months": "All Months",
+    "add_event": "Add Event"
+  },
+  "AuthButton": {
+    "login": "Login with Google",
+    "logout": "Logout"
+  }
+}
