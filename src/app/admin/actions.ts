@@ -5,19 +5,19 @@ import {
   eventsTable,
   eventTranslationsTable,
   eventsToCategoriesTable,
+  categoriesTable,
 } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { eq, and } from "drizzle-orm";
 
-/**
- * Создает новое событие в базе данных.
- */
+
 export async function createEvent(formData: FormData) {
   const name_de = formData.get("name_de") as string;
   const description_de = formData.get("description_de") as string;
   const location = formData.get("location") as string;
   const date = new Date(formData.get("date") as string);
   const categoryId = Number(formData.get("categoryId"));
+  const imageUrl = formData.get("imageUrl") as string;
 
   if (!name_de || !location || !date || !categoryId) {
     console.error("Все поля должны быть заполнены!");
@@ -27,7 +27,7 @@ export async function createEvent(formData: FormData) {
   try {
     const [newEvent] = await db
       .insert(eventsTable)
-      .values({ location, date, status: "approved" })
+      .values({ location, date, status: "approved",imageUrl })
       .returning();
 
     await db.insert(eventTranslationsTable).values({
@@ -48,9 +48,6 @@ export async function createEvent(formData: FormData) {
   }
 }
 
-/**
- * Удаляет событие и все связанные с ним данные.
- */
 export async function deleteEvent(eventId: number) {
   try {
     await db.delete(eventsTable).where(eq(eventsTable.id, eventId));
@@ -63,9 +60,6 @@ export async function deleteEvent(eventId: number) {
   }
 }
 
-/**
- * Обновляет существующее событие с более надежной логикой.
- */
 export async function updateEvent(
   prevState: { message: string; success: boolean },
   formData: FormData
@@ -76,20 +70,19 @@ export async function updateEvent(
   const location = formData.get("location") as string;
   const date = new Date(formData.get("date") as string);
   const categoryId = Number(formData.get("categoryId"));
-
   const name_en = formData.get("name_en") as string;
   const description_en = formData.get("description_en") as string;
   const name_ru = formData.get("name_ru") as string;
   const description_ru = formData.get("description_ru") as string;
+  const imageUrl = formData.get("imageUrl") as string;
 
   try {
-    // 1. Обновляем основную информацию о событии
     await db
       .update(eventsTable)
-      .set({ location, date })
+      .set({ location, date, imageUrl })
       .where(eq(eventsTable.id, eventId));
 
-    // 2. Обновляем или создаем переводы
+    
     const translations = [
       { locale: "de", name: name_de, description: description_de },
       { locale: "en", name: name_en, description: description_en },
@@ -160,3 +153,55 @@ export async function getEventForEdit(eventId: number) {
 
   return { eventData, allCategories };
 }
+
+export async function createCategory(formData: FormData) {
+  const name = formData.get("name") as string;
+  const description = formData.get("description") as string;
+
+  if (!name) {
+    // В реальном приложении здесь была бы более сложная обработка ошибок
+    console.error("Название категории не может быть пустым!");
+    return;
+  }
+
+  try {
+    await db.insert(categoriesTable).values({ name, description });
+    revalidatePath("/admin/categories"); // Обновляем кэш страницы категорий
+  } catch (error) {
+    console.error("Ошибка при создании категории:", error);
+  }
+}
+
+/**
+ * Удаляет категорию.
+ */
+export async function deleteCategory(categoryId: number) {
+  try {
+    // Проверяем, есть ли события, связанные с этой категорией
+    const relatedEvents = await db.query.eventsToCategoriesTable.findFirst({
+        where: eq(eventsToCategoriesTable.categoryId, categoryId),
+    });
+
+    if (relatedEvents) {
+        return { success: false, message: "Нельзя удалить категорию, так как к ней привязаны события." };
+    }
+
+    await db.delete(categoriesTable).where(eq(categoriesTable.id, categoryId));
+    revalidatePath("/admin/categories");
+    return { success: true, message: "Категория успешно удалена." };
+  } catch (error) {
+    console.error("Ошибка при удалении категории:", error);
+    return { success: false, message: "Не удалось удалить категорию." };
+  }
+}
+
+/**
+ * Получает все категории из базы данных.
+ */
+export async function getAllCategories() {
+  return await db.query.categoriesTable.findMany({
+    orderBy: (categories, { asc }) => [asc(categories.name)],
+  });
+}
+
+
